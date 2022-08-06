@@ -75,15 +75,40 @@ public SeaObject CreateSubmarine(){
         for (int i = 0; i < bomp.length; i++) {
             bomp[i].step();
         }
-        for (int i = 0; i < bomp.length; i++) {
-            bomp[i].step();
-        }
+//        for (int i = 0; i < bomp.length; i++) {
+//            bomp[i].step();
+//        }
 
     }
     public  void bompEnterAction(){
         Bomp b=ship.shootBomb();
         bomp=Arrays.copyOf(bomp,bomp.length+1);
         bomp[bomp.length-1]=b;
+    }
+//    删除越界元素
+    public void outOfBounds(){
+//       遍历数组
+        for(int i=1;i<submarines.length;i++){//绘制潜艇图片
+            if(submarines[i].isOutBounds()){
+                submarines[i]= submarines[submarines.length-1];//将数组中的最后一个元素赋值给当前越界对象位置i
+                submarines=Arrays.copyOf(submarines,submarines.length-1);//数组缩容
+            }
+        }
+        for (int i = 0; i < thunders.length; i++) {
+            if(thunders[i].isOutBounds()){
+                thunders[i]=thunders[thunders.length-1];
+                thunders =Arrays.copyOf(thunders,thunders.length-1);
+            }
+        }
+//        for (int i = 0; i < bomp.length; i++) {
+//            if (bomp[i].isOutBounds()) {
+//
+//                bomp[i] = bomp[bomp.length - 1];
+//                bomp = Arrays.copyOf(bomp, bomp.length - 1);
+//            }
+//        }
+
+
     }
 
     protected void action(){
@@ -117,19 +142,11 @@ public SeaObject CreateSubmarine(){
                 SubmarinesEnterAction();//调用生成潜艇方法
                 thunderEnterAction();//调用生成雷方法
                 stepAction();//调用移动方法
+                outOfBounds();
                 repaint();//重新绘制
             }
         };
         timer.schedule(task,10,10);//对象，开始时间，间隔时间
-
-
-
-
-
-
-
-
-
         //带参对象函数，可以多次调用
 //            submarines=new SeaObject[6];
 //            submarines[1]=new TorpedoSubmarine();
@@ -188,15 +205,10 @@ public void paint(Graphics g) { //系统提供绘制的方法
         bomp[i].printImage(g);
     }
 }
-
     public static void main(String[] args) {
 
         GameWorld gw=new GameWorld();//新建GameWorld对象
         gw.action();
         gw.printWprld();//调用窗口
-
-
-
-
     }
 }

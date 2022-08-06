@@ -16,6 +16,9 @@ public abstract class SeaObject { //抽象类
     public  static final int DEAD=1;//死亡状态
     public int currentState=LIVE;//默认生存状态
     protected abstract void step();
+    protected boolean isOutBounds(){
+        return  this.x>=GameWorld.WITDTH;//判断潜艇的x 是否越界
+    }
     protected abstract ImageIcon getImage();//抽象方法 封装
     SeaObject(int width,int height){
         this.width=width;

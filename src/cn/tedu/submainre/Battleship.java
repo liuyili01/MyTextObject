@@ -20,9 +20,12 @@ public class Battleship extends SeaObject{
 //    方法重写
 @Override
     public void step(){
-
         System.out.println("海战舰类重写方法");
+    }
 
+    @Override
+    protected boolean isOutBounds() {
+        return this.x<=0 || this.x>=641;
     }
 
     @Override

@@ -20,8 +20,11 @@ public class Mine extends SeaObject {
     public void step(){
 //        子类共有方法
         y-=speed;
+    }
 
-
+    @Override
+    protected boolean isOutBounds() {
+        return this.y<=150-this.height;//如果水雷对象的y小于或者等于150-自身的高，说明到水面上了
     }
 
     @Override

@@ -11,11 +11,14 @@ public class Torppedo  extends SeaObject{
     }
     @Override
       public void step(){
-
         //方法重写
 //        子类共有方法
         y-=speed+3;
+    }
 
+    @Override
+    protected boolean isOutBounds() {
+        return this.y<=-this.height;
     }
 
     @Override
