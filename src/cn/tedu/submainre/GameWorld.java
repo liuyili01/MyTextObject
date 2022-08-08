@@ -116,7 +116,7 @@ public SeaObject CreateSubmarine(){
         for (int i = 0; i < bomp.length; i++) {
             Bomp b=bomp[i]; //用每个炸弹对象来判断是否碰撞上了所有的潜艇对象
             for (int j = 0; j < submarines.length; j++) {
-                if(b.isHit(submarines[i])){
+                if(b.isHit(submarines[j])){
                     System.out.println("发生了碰撞");
                 }
             }
