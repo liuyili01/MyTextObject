@@ -35,6 +35,19 @@ public abstract class SeaObject { //抽象类
         this.height=height;
         this.speed=speed;
     };
+//    为所以有的子类创建碰撞方法
+    protected boolean isHit(SeaObject other){
+        int x1=this.x-other.width;
+        int x2=this.x-this.width; //计算当前对象和碰撞物（other）的范围
+        int y1=this.y-other.height;
+        int y2=this.y+this.height;
+//        碰撞物的x，y
+        int x=other.x;
+        int y=other.y;
+//      判断是否发生碰撞，如果发生碰撞则返回true
+        return (x>=x1 && x<=x2)&&(y>=y1 && y<=y2);
+    }
+
     protected boolean isLive(){
         return this.currentState==LIVE;
 
@@ -45,7 +58,7 @@ public abstract class SeaObject { //抽象类
     protected SeaObject shootSubmarin(){
         int x=this.x+this.width;//雷对象的x坐标
         int y=this.y-5;//雷的坐标
-        if(this instanceof TorpedoSubmarine){//判断当前对象是鱼雷潜艇类型的话
+        if(this instanceof TorpedoSubmarine){//判断当前对象是鱼雷潜艇类型的话  关键字 instanceof是判断类型语句
             return new Torppedo(x,y);//
 
         }else if (this instanceof MinSubmarine){//如果当前对象是水雷潜艇类型的话

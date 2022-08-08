@@ -110,6 +110,20 @@ public SeaObject CreateSubmarine(){
 
 
     }
+//    处理深水炸弹与潜艇碰撞的行为使用实现
+    public void bompBangAction(){
+//        碰撞判断
+        for (int i = 0; i < bomp.length; i++) {
+            Bomp b=bomp[i]; //用每个炸弹对象来判断是否碰撞上了所有的潜艇对象
+            for (int j = 0; j < submarines.length; j++) {
+                if(b.isHit(submarines[i])){
+                    System.out.println("发生了碰撞");
+                }
+            }
+        }
+
+
+    }
 
     protected void action(){
         //实现侦听
@@ -117,7 +131,7 @@ public SeaObject CreateSubmarine(){
             @Override
             public void keyPressed(KeyEvent e) {//参数e代表用户按下的键e.getKeyCode
                 if(e.getKeyCode()==KeyEvent.VK_SPACE){ //返回值是ASCII
-                    System.out.println(KeyEvent.VK_SPACE);
+//                    System.out.println(KeyEvent.VK_SPACE);
                     bompEnterAction();
 
 
@@ -142,6 +156,7 @@ public SeaObject CreateSubmarine(){
                 SubmarinesEnterAction();//调用生成潜艇方法
                 thunderEnterAction();//调用生成雷方法
                 stepAction();//调用移动方法
+                bompBangAction();//调用碰撞测试方法
                 outOfBounds();
                 repaint();//重新绘制
             }
