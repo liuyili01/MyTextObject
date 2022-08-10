@@ -15,10 +15,10 @@ public abstract class SeaObject { //抽象类
     public static final int LIVE=0;//生存状态
     public  static final int DEAD=1;//死亡状态
     public int currentState=LIVE;//默认生存状态
+    private int life;
+
     protected abstract void step();
-    protected boolean isOutBounds(){
-        return  this.x>=GameWorld.WITDTH;//判断潜艇的x 是否越界
-    }
+
     protected abstract ImageIcon getImage();//抽象方法 封装
     SeaObject(int width,int height){
         this.width=width;
@@ -35,7 +35,7 @@ public abstract class SeaObject { //抽象类
         this.height=height;
         this.speed=speed;
     };
-//    为所以有的子类创建碰撞方法
+//    为所有的子类创建碰撞方法
     protected boolean isHit(SeaObject other){
         int x1=this.x-other.width;
         int x2=this.x-this.width; //计算当前对象和碰撞物（other）的范围
@@ -47,14 +47,20 @@ public abstract class SeaObject { //抽象类
 //      判断是否发生碰撞，如果发生碰撞则返回true
         return (x>=x1 && x<=x2)&&(y>=y1 && y<=y2);
     }
+    protected boolean isOutBounds(){
+        return  this.x>=GameWorld.WITDTH;//判断潜艇的x 是否越界
+    }
 
+    protected void goDead(){//死亡方法
+        this.currentState=DEAD;//将当前对象的状态设置为死亡状态
+    }
     protected boolean isLive(){
         return this.currentState==LIVE;
 
     }
     protected boolean isDead(){
         return this.currentState==DEAD;
-    }
+    }//判断死亡状态
     protected SeaObject shootSubmarin(){
         int x=this.x+this.width;//雷对象的x坐标
         int y=this.y-5;//雷的坐标
@@ -69,8 +75,8 @@ public abstract class SeaObject { //抽象类
     }
     public void printImage(Graphics g){
         ImageIcon icon=this.getImage();
-        if (icon!=null){
-            icon.paintIcon(null,g,this.x,this.y);
+        if (icon!=null){//判断对象状态  做图片消失
+             icon.paintIcon(null,g,this.x,this.y);
         }
     }
 }

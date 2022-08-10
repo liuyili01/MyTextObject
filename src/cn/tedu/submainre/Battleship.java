@@ -3,9 +3,15 @@ package cn.tedu.submainre;
 import javax.swing.*;
 
 //战舰类
-public class Battleship extends SeaObject{
+public class Battleship extends SeaObject {
 
     private int life;
+    public int getLife(){
+        return this.life;//对外返回生命的参数
+    }
+    public void setLife(int life){
+        this.life+=life;//对外提供修改生命的值的方法
+    }
     Battleship(){
         super(270,124,66,26,20);
 //       调用父类带参构造函数
@@ -23,10 +29,10 @@ public class Battleship extends SeaObject{
         System.out.println("海战舰类重写方法");
     }
 
-    @Override
-    protected boolean isOutBounds() {
-        return this.x<=0 || this.x>=641;
-    }
+//    @Override
+//    protected boolean isOutBounds() {
+//        return this.x<=0 || this.x>=641;
+//    }
 
     @Override
     protected ImageIcon getImage() {//战舰比较特殊，有有血量，且战舰死亡游戏结束

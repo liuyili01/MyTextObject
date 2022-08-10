@@ -20,9 +20,10 @@ public class GameWorld extends JPanel {
     //继承底板类
     public static final int WITDTH=641;
     public static final int HEIGHR=479;//窗口宽高
-    protected Battleship ship=new Battleship();  //  --成员变量（全局变量）
-    protected Bomp[] bomp={};//创建一个深水炸弹类
-    protected SeaObject[] submarines={};//所有潜艇的父类型数组
+    private int score=0;//游戏分数
+    private Battleship ship=new Battleship();  //  --成员变量（全局变量）
+    private Bomp[] bomp={};//创建一个深水炸弹类
+    private SeaObject[] submarines={};//所有潜艇的父类型数组
 //    ObserverSubmarine[] observerSubmmarine;
 //    MinSubmarine[] minSubmarine ; //三种潜艇对象
 //    TorpedoSubmarine[] torpedoSubmarine ;
@@ -33,7 +34,7 @@ public SeaObject CreateSubmarine(){
     int a=(int)(Math.rint( Math.random()*20));
     if(a<8){
         return new ObserverSubmarine();
-    }else if(a<14){
+    }else if(a<14){//游戏难度设定
         return new MinSubmarine();//随机生成潜艇对象
     }else {
         return new TorpedoSubmarine();
@@ -75,41 +76,54 @@ public SeaObject CreateSubmarine(){
         for (int i = 0; i < bomp.length; i++) {
             bomp[i].step();
         }
-//        for (int i = 0; i < bomp.length; i++) {
-//            bomp[i].step();
-//        }
+
 
     }
     public  void bompEnterAction(){
+        System.out.println(11111);
         Bomp b=ship.shootBomb();
         bomp=Arrays.copyOf(bomp,bomp.length+1);
         bomp[bomp.length-1]=b;
+
+    }
+    public void outOfBounds() {
+        submarines = reconstruction(submarines);
+//        bomp = (Bomp[]) reconstruction(bomp);
+        thunders = reconstruction(thunders);
     }
 //    删除越界元素
-    public void outOfBounds(){
-//       遍历数组
-        for(int i=1;i<submarines.length;i++){//绘制潜艇图片
-            if(submarines[i].isOutBounds()){
-                submarines[i]= submarines[submarines.length-1];//将数组中的最后一个元素赋值给当前越界对象位置i
-                submarines=Arrays.copyOf(submarines,submarines.length-1);//数组缩容
+
+    public SeaObject[] reconstruction(SeaObject[] seaObjects){
+        for (int i = 0; i < seaObjects.length; i++) {
+            if(seaObjects[i].isOutBounds()||seaObjects[i].isDead()){
+                seaObjects[i]=seaObjects[seaObjects.length-1];
+                seaObjects=Arrays.copyOf(seaObjects,seaObjects.length-1);
             }
         }
-        for (int i = 0; i < thunders.length; i++) {
-            if(thunders[i].isOutBounds()){
-                thunders[i]=thunders[thunders.length-1];
-                thunders =Arrays.copyOf(thunders,thunders.length-1);
-            }
-        }
-//        for (int i = 0; i < bomp.length; i++) {
+        return seaObjects;
+    }
+
+////       遍历数组
+//        for(int i=1;i<submarines.length;i++){//绘制潜艇图片
+//            if(submarines[i].isOutBounds()|| submarines[i].isDead()){  //删除图片方法
+//                submarines[i]= submarines[submarines.length-1];//将数组中的最后一个元素赋值给当前越界对象位置i
+//                submarines=Arrays.copyOf(submarines,submarines.length-1);//数组缩容
+//            }
+//        }
+//        for (int i = 0; i < thunders.length; i++) {
+//            if(thunders[i].isOutBounds()){
+//                thunders[i]=thunders[thunders.length-1];
+//                thunders =Arrays.copyOf(thunders,thunders.length-1);
+//            }
+//        }
+////        for (int i = 0; i < bomp.length; i++) {
 //            if (bomp[i].isOutBounds()) {
 //
 //                bomp[i] = bomp[bomp.length - 1];
 //                bomp = Arrays.copyOf(bomp, bomp.length - 1);
 //            }
-//        }
 
 
-    }
 //    处理深水炸弹与潜艇碰撞的行为使用实现
     public void bompBangAction(){
 //        碰撞判断
@@ -118,23 +132,43 @@ public SeaObject CreateSubmarine(){
             for (int j = 0; j < submarines.length; j++) {
                 if(b.isHit(submarines[j])){
                     System.out.println("发生了碰撞");
+                    b.goDead();
+//                    可以通过instanceof来判断sumbarines来判断数据类型，执行不同的逻辑
+                    submarines[j].goDead();//对象图片消失
+                    if(submarines[j] instanceof  ObserverSubmarine){ //判断是否为侦查潜艇对象
+                        ObserverSubmarine os=(ObserverSubmarine) submarines[j];//强制类型转换
+                        score+=os.Score();
+                    }else if(submarines[j] instanceof TorpedoSubmarine){
+                        TorpedoSubmarine ts=(TorpedoSubmarine) submarines[j];
+                        score+=ts.Score();
+                    } else if(submarines[j] instanceof  MinSubmarine){
+                        MinSubmarine mi=(MinSubmarine) submarines[j];
+//                        +=mi.getLife();
+                    }
+
+
+
+
                 }
             }
         }
 
 
     }
-
+    public void thunderBangAction(){
+        for (int i = 0; i < thunders.length; i++) {
+            if(thunders[i].isHit(ship)){
+                thunders[i].goDead();//当前类对象标记为死亡对象
+            }
+        }
+    }
     protected void action(){
         //实现侦听
         KeyAdapter adapter=new KeyAdapter() { //键盘侦听器
             @Override
             public void keyPressed(KeyEvent e) {//参数e代表用户按下的键e.getKeyCode
                 if(e.getKeyCode()==KeyEvent.VK_SPACE){ //返回值是ASCII
-//                    System.out.println(KeyEvent.VK_SPACE);
                     bompEnterAction();
-
-
                 }
                 if(e.getKeyCode()==KeyEvent.VK_LEFT){
                     ship.leftMove();
@@ -157,6 +191,7 @@ public SeaObject CreateSubmarine(){
                 thunderEnterAction();//调用生成雷方法
                 stepAction();//调用移动方法
                 bompBangAction();//调用碰撞测试方法
+                thunderBangAction();
                 outOfBounds();
                 repaint();//重新绘制
             }
@@ -210,7 +245,7 @@ public void paint(Graphics g) { //系统提供绘制的方法
     ImageResources.sea.paintIcon(null,g,0,0);
     //绘制战舰图片
     ship.printImage(g);
-    for(int i=1;i<submarines.length;i++){//绘制潜艇图片
+    for(int i=0;i<submarines.length;i++){//绘制潜艇图片
         submarines[i].printImage(g);
     }
     for (int i = 0; i < thunders.length; i++) {
@@ -219,6 +254,9 @@ public void paint(Graphics g) { //系统提供绘制的方法
     for (int i = 0; i < bomp.length; i++) {
         bomp[i].printImage(g);
     }
+    g.setFont(new Font("",Font.BOLD,20));
+    g.drawString("Score"+score,200,50);//窗口界面绘制文字
+    g.drawString("Life"+ship.getLife(),400,50);//窗口绘制文字
 }
     public static void main(String[] args) {
 

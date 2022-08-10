@@ -18,10 +18,7 @@ public class Bomp extends SeaObject {
         y+=speed;
     }
 
-    @Override
-    protected boolean isOutBounds() {
-        return this.y>=GameWorld.HEIGHT;//判断深水炸弹是否越界
-    }
+
 
     @Override
     protected ImageIcon getImage() {//需要判断深水炸弹对象的生存状态
@@ -30,5 +27,9 @@ public class Bomp extends SeaObject {
 
         }
         return null;
+    }
+    @Override
+    protected boolean isOutBounds() {
+        return this.y>=GameWorld.HEIGHT;//判断深水炸弹是否越界
     }
 }
