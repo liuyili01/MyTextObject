@@ -17,9 +17,6 @@ public class TorpedoSubmarine  extends SeaObject implements EnemyScore{
 //        子类共有方法 方法重写
         x+=speed;
     }
-    protected boolean isOutBounds() {
-        return this.x>=641;
-    }
     @Override
     protected ImageIcon getImage() {
         if(isLive()){

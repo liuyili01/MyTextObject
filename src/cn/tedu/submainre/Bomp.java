@@ -30,6 +30,6 @@ public class Bomp extends SeaObject {
     }
     @Override
     protected boolean isOutBounds() {
-        return this.y>=GameWorld.HEIGHT;//判断深水炸弹是否越界
+        return this.y>=GameWorld.HEIGHR;//判断深水炸弹是否越界
     }
 }

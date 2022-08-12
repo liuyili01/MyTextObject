@@ -14,9 +14,6 @@ public class ObserverSubmarine extends SeaObject implements EnemyScore {
 //        子类共有方法
         x+=speed;
     }
-    protected boolean isOutBounds() {
-        return this.x>=641;
-    }
 
     @Override
     protected ImageIcon getImage() {

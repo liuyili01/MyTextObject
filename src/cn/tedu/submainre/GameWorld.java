@@ -1,4 +1,5 @@
 package cn.tedu.submainre;
+
 import javax.swing.*;
 import java.util.TimerTask;//定时器任务模板
 import java.util.Timer;//定时器模板
@@ -7,55 +8,56 @@ import java.awt.event.KeyEvent;//键盘事件
 import java.awt.event.KeyAdapter;//键盘侦听器
 
 
-
-
 import java.awt.*;
 
 /*
-* 游戏窗口类
-* 游戏运行类
-* */
+ * 游戏窗口类
+ * 游戏运行类
+ * */
 public class GameWorld extends JPanel {
 
     //继承底板类
-    public static final int WITDTH=641;
-    public static final int HEIGHR=479;//窗口宽高
-    private int score=0;//游戏分数
-    private Battleship ship=new Battleship();  //  --成员变量（全局变量）
-    private Bomp[] bomp={};//创建一个深水炸弹类
-    private SeaObject[] submarines={};//所有潜艇的父类型数组
-//    ObserverSubmarine[] observerSubmmarine;
+    public static final int WITDTH = 641;
+    public static final int HEIGHR = 479;//窗口宽高
+    private int score = 0;//游戏分数
+    private Battleship ship = new Battleship();  //  --成员变量（全局变量）
+    private Bomp[] bomp = {};//创建一个深水炸弹类
+    private SeaObject[] submarines = {};//所有潜艇的父类型数组
+    //    ObserverSubmarine[] observerSubmmarine;
 //    MinSubmarine[] minSubmarine ; //三种潜艇对象
 //    TorpedoSubmarine[] torpedoSubmarine ;
-   protected SeaObject[] thunders={};//两张炸弹的父类型数组对象但是没有开辟空间
-//    Mine[] mine;
+    protected SeaObject[] thunders = {};//两张炸弹的父类型数组对象但是没有开辟空间
+
+    //    Mine[] mine;
 //    Torppedo[] torppedo ;//=new Torppedo();//创建一个鱼雷对象，这样创建也生效,但是无法重复调用
-public SeaObject CreateSubmarine(){
-    int a=(int)(Math.rint( Math.random()*20));
-    if(a<8){
-        return new ObserverSubmarine();
-    }else if(a<14){//游戏难度设定
-        return new MinSubmarine();//随机生成潜艇对象
-    }else {
-        return new TorpedoSubmarine();
+    public SeaObject CreateSubmarine() {
+        int a = (int) (Math.rint(Math.random() * 20));
+        if (a < 8) {
+            return new ObserverSubmarine();
+        } else if (a < 14) {//游戏难度设定
+            return new MinSubmarine();//随机生成潜艇对象
+        } else {
+            return new TorpedoSubmarine();
+        }
     }
-}
-    public int sumbarineEnterIndex=0;//潜艇对象生成速度的索引
-    public int thunderEnterIndex=0;
-//潜艇对象入场  放进run中自动执行
-    public void SubmarinesEnterAction(){
+
+    public int sumbarineEnterIndex = 0;//潜艇对象生成速度的索引
+    public int thunderEnterIndex = 0;
+
+    //潜艇对象入场  放进run中自动执行
+    public void SubmarinesEnterAction() {
         sumbarineEnterIndex++;//每10毫秒自增一次
-        if(sumbarineEnterIndex%30==0) { //控制潜艇生成速度 做延迟
+        if (sumbarineEnterIndex % 30 == 0) { //控制潜艇生成速度 做延迟
             SeaObject obj = CreateSubmarine();
             submarines = Arrays.copyOf(submarines, submarines.length + 1);//数组扩容
             submarines[submarines.length - 1] = obj;
         }
     }
 
-//    雷入场的方法
-    public void thunderEnterAction(){
+    //    雷入场的方法
+    public void thunderEnterAction() {
         thunderEnterIndex++;
-        if(thunderEnterIndex%100==0) {//延迟执行
+        if (thunderEnterIndex % 100 == 0) {//延迟执行
             for (int i = 0; i < submarines.length; i++) {
                 SeaObject obj = submarines[i].shootSubmarin();//接收雷对象
                 if (obj != null) {
@@ -65,8 +67,9 @@ public SeaObject CreateSubmarine(){
             }
         }
     }
-//移动执行方法,自动移动对象的方法
-    public void stepAction(){
+
+    //移动执行方法,自动移动对象的方法
+    public void stepAction() {
         for (int i = 0; i < submarines.length; i++) {
             submarines[i].step();  //遍历各个数组对象的对象中的step方法。
         }
@@ -79,25 +82,26 @@ public SeaObject CreateSubmarine(){
 
 
     }
-    public  void bompEnterAction(){
-        System.out.println(11111);
-        Bomp b=ship.shootBomb();
-        bomp=Arrays.copyOf(bomp,bomp.length+1);
-        bomp[bomp.length-1]=b;
+
+    public void bompEnterAction() {
+        Bomp b = ship.shootBomb();
+        bomp = Arrays.copyOf(bomp, bomp.length + 1);
+        bomp[bomp.length - 1] = b;
 
     }
+
     public void outOfBounds() {
         submarines = reconstruction(submarines);
-//        bomp = (Bomp[]) reconstruction(bomp);
+        bomp = (Bomp[]) reconstruction(bomp);
         thunders = reconstruction(thunders);
     }
 //    删除越界元素
 
-    public SeaObject[] reconstruction(SeaObject[] seaObjects){
+    public SeaObject[] reconstruction(SeaObject[] seaObjects) {
         for (int i = 0; i < seaObjects.length; i++) {
-            if(seaObjects[i].isOutBounds()||seaObjects[i].isDead()){
-                seaObjects[i]=seaObjects[seaObjects.length-1];
-                seaObjects=Arrays.copyOf(seaObjects,seaObjects.length-1);
+            if (seaObjects[i].isOutBounds() || seaObjects[i].isDead()) {
+                seaObjects[i] = seaObjects[seaObjects.length - 1];
+                seaObjects = Arrays.copyOf(seaObjects, seaObjects.length - 1);
             }
         }
         return seaObjects;
@@ -124,29 +128,28 @@ public SeaObject CreateSubmarine(){
 //            }
 
 
-//    处理深水炸弹与潜艇碰撞的行为使用实现
-    public void bompBangAction(){
+    //    处理深水炸弹与潜艇碰撞的行为使用实现
+    public void bompBangAction() {
 //        碰撞判断
         for (int i = 0; i < bomp.length; i++) {
-            Bomp b=bomp[i]; //用每个炸弹对象来判断是否碰撞上了所有的潜艇对象
+            Bomp b = bomp[i]; //用每个炸弹对象来判断是否碰撞上了所有的潜艇对象
             for (int j = 0; j < submarines.length; j++) {
-                if(b.isHit(submarines[j])){
+                if (b.isHit(submarines[j])) {
                     System.out.println("发生了碰撞");
                     b.goDead();
 //                    可以通过instanceof来判断sumbarines来判断数据类型，执行不同的逻辑
                     submarines[j].goDead();//对象图片消失
-                    if(submarines[j] instanceof  ObserverSubmarine){ //判断是否为侦查潜艇对象
-                        ObserverSubmarine os=(ObserverSubmarine) submarines[j];//强制类型转换
-                        score+=os.Score();
-                    }else if(submarines[j] instanceof TorpedoSubmarine){
-                        TorpedoSubmarine ts=(TorpedoSubmarine) submarines[j];
-                        score+=ts.Score();
-                    } else if(submarines[j] instanceof  MinSubmarine){
-                        MinSubmarine mi=(MinSubmarine) submarines[j];
-//                        +=mi.getLife();
+                    if (submarines[j] instanceof ObserverSubmarine) { //判断是否为侦查潜艇对象
+                        ObserverSubmarine os = (ObserverSubmarine) submarines[j];//强制类型转换
+                        score += os.Score();
+                    } else if (submarines[j] instanceof TorpedoSubmarine) {
+                        TorpedoSubmarine ts = (TorpedoSubmarine) submarines[j];
+                        score += ts.Score();
+                    } else if (submarines[j] instanceof MinSubmarine) {
+                        MinSubmarine mi = (MinSubmarine) submarines[j];
+                        int life=mi.getLife();//获取水雷潜艇提供命数
+                        ship.setLife(life);//调用战舰对象的setLife方法 得到命数传递
                     }
-
-
 
 
                 }
@@ -155,25 +158,27 @@ public SeaObject CreateSubmarine(){
 
 
     }
-    public void thunderBangAction(){
+
+    public void thunderBangAction() {
         for (int i = 0; i < thunders.length; i++) {
-            if(thunders[i].isHit(ship)){
+            if (thunders[i].isHit(ship)) {
                 thunders[i].goDead();//当前类对象标记为死亡对象
             }
         }
     }
-    protected void action(){
+
+    protected void action() {
         //实现侦听
-        KeyAdapter adapter=new KeyAdapter() { //键盘侦听器
+        KeyAdapter adapter = new KeyAdapter() { //键盘侦听器
             @Override
             public void keyPressed(KeyEvent e) {//参数e代表用户按下的键e.getKeyCode
-                if(e.getKeyCode()==KeyEvent.VK_SPACE){ //返回值是ASCII
+                if (e.getKeyCode() == KeyEvent.VK_SPACE) { //返回值是ASCII
                     bompEnterAction();
                 }
-                if(e.getKeyCode()==KeyEvent.VK_LEFT){
+                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                     ship.leftMove();
                 }
-                if (e.getKeyCode()==KeyEvent.VK_RIGHT){
+                if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     ship.rightMove();
                 }
 
@@ -182,8 +187,8 @@ public SeaObject CreateSubmarine(){
         };
         this.addKeyListener(adapter);//侦听的对象
 
-        Timer timer=new Timer();//创建定时器对象
-        TimerTask task=new TimerTask() {//定时器  匿名内部类
+        Timer timer = new Timer();//创建定时器对象
+        TimerTask task = new TimerTask() {//定时器  匿名内部类
             @Override
             public void run() { //内部类
 
@@ -196,7 +201,7 @@ public SeaObject CreateSubmarine(){
                 repaint();//重新绘制
             }
         };
-        timer.schedule(task,10,10);//对象，开始时间，间隔时间
+        timer.schedule(task, 10, 10);//对象，开始时间，间隔时间
         //带参对象函数，可以多次调用
 //            submarines=new SeaObject[6];
 //            submarines[1]=new TorpedoSubmarine();
@@ -230,37 +235,39 @@ public SeaObject CreateSubmarine(){
     }
 //绘制游戏窗口
 
-    protected void printWprld(){
-        JFrame frame=new JFrame();//创建具体的画框对象
+    protected void printWprld() {
+        JFrame frame = new JFrame();//创建具体的画框对象
         this.setFocusable(true);//设置当前是否可聚焦
         frame.add(this);//添加底板当前GameWorld类
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//设置默认关闭操作 点击关闭按钮释放程序
-        frame.setSize(WITDTH+16,HEIGHR+39);//设置窗口大小
+        frame.setSize(WITDTH + 16, HEIGHR + 39);//设置窗口大小
         frame.setLocationRelativeTo(null);//设置相对位置
         frame.setVisible(true);//设置是否可见
     }
-//    绘制游戏图片对象
-public void paint(Graphics g) { //系统提供绘制的方法
+
+    //    绘制游戏图片对象
+    public void paint(Graphics g) { //系统提供绘制的方法
 //        绘制背景板
-    ImageResources.sea.paintIcon(null,g,0,0);
-    //绘制战舰图片
-    ship.printImage(g);
-    for(int i=0;i<submarines.length;i++){//绘制潜艇图片
-        submarines[i].printImage(g);
+        ImageResources.sea.paintIcon(null, g, 0, 0);
+        //绘制战舰图片
+        ship.printImage(g);
+        for (int i = 0; i < submarines.length; i++) {//绘制潜艇图片
+            submarines[i].printImage(g);
+        }
+        for (int i = 0; i < thunders.length; i++) {
+            thunders[i].printImage(g);
+        }
+        for (int i = 0; i < bomp.length; i++) {
+            bomp[i].printImage(g);
+        }
+        g.setFont(new Font("", Font.BOLD, 20));
+        g.drawString("Score" + score, 200, 50);//窗口界面绘制文字
+        g.drawString("Life" + ship.getLife(), 400, 50);//窗口绘制文字
     }
-    for (int i = 0; i < thunders.length; i++) {
-        thunders[i].printImage(g);
-    }
-    for (int i = 0; i < bomp.length; i++) {
-        bomp[i].printImage(g);
-    }
-    g.setFont(new Font("",Font.BOLD,20));
-    g.drawString("Score"+score,200,50);//窗口界面绘制文字
-    g.drawString("Life"+ship.getLife(),400,50);//窗口绘制文字
-}
+
     public static void main(String[] args) {
 
-        GameWorld gw=new GameWorld();//新建GameWorld对象
+        GameWorld gw = new GameWorld();//新建GameWorld对象
         gw.action();
         gw.printWprld();//调用窗口
     }

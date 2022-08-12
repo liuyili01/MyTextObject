@@ -14,9 +14,6 @@ public class MinSubmarine extends SeaObject implements EnemyLife{
 //        子类共有方法
         x+=speed;
     }
-    protected boolean isOutBounds() {
-        return this.x>=641;
-    }
 
     @Override
     protected ImageIcon getImage() {
