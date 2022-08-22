@@ -1,12 +1,14 @@
 package cn.tedu.submainre;
 
+import org.omg.CORBA.PUBLIC_MEMBER;
+
 import javax.swing.*;
 import java.util.TimerTask;//定时器任务模板
 import java.util.Timer;//定时器模板
 import java.util.Arrays;
 import java.awt.event.KeyEvent;//键盘事件
 import java.awt.event.KeyAdapter;//键盘侦听器
-
+//思考 游戏结束如何重新开始 战舰会溢出屏幕外
 
 import java.awt.*;
 
@@ -19,6 +21,10 @@ public class GameWorld extends JPanel {
     //继承底板类
     public static final int WITDTH = 641;
     public static final int HEIGHR = 479;//窗口宽高
+    public static final int GAME_START=0;//游戏开始状态
+    public static final int RUNNING=1;//游戏运行状态
+    public static final int GAME_OVER=2;//游戏结束状态
+    private int GameCurrenStare=GAME_START;//默认为开始状态
     private int score = 0;//游戏分数
     private Battleship ship = new Battleship();  //  --成员变量（全局变量）
     private Bomp[] bomp = {};//创建一个深水炸弹类
@@ -139,17 +145,25 @@ public class GameWorld extends JPanel {
                     b.goDead();
 //                    可以通过instanceof来判断sumbarines来判断数据类型，执行不同的逻辑
                     submarines[j].goDead();//对象图片消失
-                    if (submarines[j] instanceof ObserverSubmarine) { //判断是否为侦查潜艇对象
-                        ObserverSubmarine os = (ObserverSubmarine) submarines[j];//强制类型转换
-                        score += os.Score();
-                    } else if (submarines[j] instanceof TorpedoSubmarine) {
-                        TorpedoSubmarine ts = (TorpedoSubmarine) submarines[j];
-                        score += ts.Score();
-                    } else if (submarines[j] instanceof MinSubmarine) {
-                        MinSubmarine mi = (MinSubmarine) submarines[j];
-                        int life=mi.getLife();//获取水雷潜艇提供命数
-                        ship.setLife(life);//调用战舰对象的setLife方法 得到命数传递
+                    if(submarines[j] instanceof EnemyScore){ //判断类型是不是EnemyScore类型，子类继承了父类也有父类属性
+                        EnemyScore obj=(EnemyScore) submarines[j];
+                        score += obj.Score();
+                    }else if(submarines[j] instanceof EnemyLife){
+                        EnemyLife obj=(EnemyLife) submarines[j];
+                        int life= obj.getLife();
+                        ship.setLife(life);
                     }
+//                    if (submarines[j] instanceof ObserverSubmarine) { //判断是否为侦查潜艇对象
+//                        ObserverSubmarine os = (ObserverSubmarine) submarines[j];//强制类型转换
+//                        score += os.Score();
+//                    } else if (submarines[j] instanceof TorpedoSubmarine) {
+//                        TorpedoSubmarine ts = (TorpedoSubmarine) submarines[j];
+//                        score += ts.Score();
+//                    } else if (submarines[j] instanceof MinSubmarine) {
+//                        MinSubmarine mi = (MinSubmarine) submarines[j];
+//                        int life=mi.getLife();//获取水雷潜艇提供命数
+//                        ship.setLife(life);//调用战舰对象的setLife方法 得到命数传递
+//                    }
 
 
                 }
@@ -163,7 +177,13 @@ public class GameWorld extends JPanel {
         for (int i = 0; i < thunders.length; i++) {
             if (thunders[i].isHit(ship)) {
                 thunders[i].goDead();//当前类对象标记为死亡对象
+                ship.shipLife();
             }
+        }
+    }
+    public void checkGameOver(){
+        if(ship.getLife()<=0){
+            GameCurrenStare=GAME_OVER;
         }
     }
 
@@ -172,8 +192,12 @@ public class GameWorld extends JPanel {
         KeyAdapter adapter = new KeyAdapter() { //键盘侦听器
             @Override
             public void keyPressed(KeyEvent e) {//参数e代表用户按下的键e.getKeyCode
-                if (e.getKeyCode() == KeyEvent.VK_SPACE) { //返回值是ASCII
-                    bompEnterAction();
+                if (e.getKeyCode() == KeyEvent.VK_SPACE ) {
+                    //返回值是ASCII
+                    if(GameCurrenStare==GAME_START){
+                        GameCurrenStare=RUNNING;//判断游戏状态
+                    }else { bompEnterAction();}
+
                 }
                 if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                     ship.leftMove();
@@ -191,14 +215,16 @@ public class GameWorld extends JPanel {
         TimerTask task = new TimerTask() {//定时器  匿名内部类
             @Override
             public void run() { //内部类
-
-                SubmarinesEnterAction();//调用生成潜艇方法
-                thunderEnterAction();//调用生成雷方法
-                stepAction();//调用移动方法
-                bompBangAction();//调用碰撞测试方法
-                thunderBangAction();
-                outOfBounds();
-                repaint();//重新绘制
+                    if(GameCurrenStare==RUNNING) {//当游戏运行时
+                        SubmarinesEnterAction();//调用生成潜艇方法
+                        thunderEnterAction();//调用生成雷方法
+                        stepAction();//调用移动方法
+                        bompBangAction();//调用碰撞测试方法
+                        thunderBangAction();
+                        checkGameOver();
+                        outOfBounds();
+                        repaint();//重新绘制
+                    }
             }
         };
         timer.schedule(task, 10, 10);//对象，开始时间，间隔时间
@@ -248,21 +274,34 @@ public class GameWorld extends JPanel {
     //    绘制游戏图片对象
     public void paint(Graphics g) { //系统提供绘制的方法
 //        绘制背景板
-        ImageResources.sea.paintIcon(null, g, 0, 0);
+
         //绘制战舰图片
-        ship.printImage(g);
-        for (int i = 0; i < submarines.length; i++) {//绘制潜艇图片
-            submarines[i].printImage(g);
+        switch (GameCurrenStare){//判断游戏整体状态
+            case GAME_START:
+                ImageResources.start.paintIcon(null,g,0,0);//绘制开始界面
+            break;
+            case RUNNING:
+                ImageResources.sea.paintIcon(null, g, 0, 0);
+                ship.printImage(g);
+                for (int i = 0; i < submarines.length; i++) {//绘制潜艇图片
+                    submarines[i].printImage(g);
+                }
+                for (int i = 0; i < thunders.length; i++) {
+                    thunders[i].printImage(g);
+                }
+                for (int i = 0; i < bomp.length; i++) {
+                    bomp[i].printImage(g);
+                }
+                g.setFont(new Font("", Font.BOLD, 20));
+                g.drawString("Score" + score, 200, 50);//窗口界面绘制文字
+                g.drawString("Life" + ship.getLife(), 400, 50);//窗口绘制文字
+            break;
+            case GAME_OVER:
+                ImageResources.gameover.paintIcon(null,g,0,0);
+
+            break;
         }
-        for (int i = 0; i < thunders.length; i++) {
-            thunders[i].printImage(g);
-        }
-        for (int i = 0; i < bomp.length; i++) {
-            bomp[i].printImage(g);
-        }
-        g.setFont(new Font("", Font.BOLD, 20));
-        g.drawString("Score" + score, 200, 50);//窗口界面绘制文字
-        g.drawString("Life" + ship.getLife(), 400, 50);//窗口绘制文字
+
     }
 
     public static void main(String[] args) {

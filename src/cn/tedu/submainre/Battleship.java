@@ -12,6 +12,9 @@ public class Battleship extends SeaObject {
     public void setLife(int life){
         this.life+=life;//对外提供修改生命的值的方法
     }
+    public void shipLife(){
+        this.life--;
+    }
     Battleship(){
         super(270,124,66,26,20);
 //       调用父类带参构造函数
@@ -23,6 +26,7 @@ public class Battleship extends SeaObject {
     public  void rightMove(){
         this.x+=speed;
     }
+
 //    方法重写
 @Override
     public void step(){
